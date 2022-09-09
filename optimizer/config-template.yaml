@@ -1,0 +1,49 @@
+---
+RecipeFormatVersion: '2020-01-25'
+ComponentName: WindFarmOptimizer
+ComponentVersion: 1.0.0
+ComponentDescription: WindFarm Optimizer Component
+ComponentPublisher: Doug Anson
+ComponentDependencies:
+  aws.greengrass.SageMakerEdgeManager:
+    VersionRequirement: '>=1.0.0'
+    DependencyType: HARD
+
+ComponentConfiguration:
+  DefaultConfiguration:
+          Parameters: {
+                "model_name": "wind-farm-model",
+                "target_device": "lambda",
+                "gg_install_root": "/greengrass/v2",
+                "gg_endpoint_url": "MY_IOTCORE_ENDPOINT_ADDRESS_GOES_HERE",
+                "gg_endpoint_uuid": "cloudformation",
+                "root_cert_filename": "rootCA.pem",
+                "result_topic": "optimize/result",
+                "input_topic": "optimize/input"
+          }
+Manifests:
+  - Name: Linux
+    Platform:
+      os: linux
+      architecture: "/amd64|x86|aarch64|arm64/"
+    Lifecycle:
+      setenv: {
+              "AWS_WF_PARAMETERS": "{configuration:/Parameters}"
+        }
+      install: 
+        RequiresPrivilege: true
+        script: |-
+          python3 -m pip install grpcio grpcio-tools protobuf AWSIoTPythonSDK pandas scipy uuid pandas
+      run:
+        script: |- 
+          /bin/bash {artifacts:path}/launch_optimizer.sh {artifacts:path}
+      shutdown:
+        RequiresPrivilege: true
+        script: |-
+          /bin/bash {artifacts:path}/stop.sh {artifacts:path}
+    Artifacts:
+      - URI: s3://MY_S3_BUCKET_GOES_HERE/artifacts/WindFarmOptimizer/1.0.0/wind_farm_optimizer.py
+      - URI: s3://MY_S3_BUCKET_GOES_HERE/artifacts/WindFarmOptimizer/1.0.0/agent_pb2.py
+      - URI: s3://MY_S3_BUCKET_GOES_HERE/artifacts/WindFarmOptimizer/1.0.0/agent_pb2_grpc.py
+      - URI: s3://MY_S3_BUCKET_GOES_HERE/artifacts/WindFarmOptimizer/1.0.0/launch_optimizer.sh
+      - URI: s3://MY_S3_BUCKET_GOES_HERE/artifacts/WindFarmOptimizer/1.0.0/stop.sh

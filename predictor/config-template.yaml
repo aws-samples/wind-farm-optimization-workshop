@@ -3,7 +3,7 @@ RecipeFormatVersion: '2020-01-25'
 ComponentName: WindFarmPredictor
 ComponentVersion: 1.0.0
 ComponentDescription: WindFarm Predictor Component
-ComponentPublisher: Doug Anson
+ComponentPublisher: AWS
 ComponentDependencies:
   aws.greengrass.SageMakerEdgeManager:
     VersionRequirement: '>=1.0.0'
